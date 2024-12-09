@@ -1,5 +1,6 @@
 package ba.imad.sis.domain;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -11,6 +12,8 @@ public class StudentCourse {
     @GeneratedValue
     private Long id;
     private Integer points;
+    @Nullable
+    private Integer grade;
     @OneToOne
     private Course course;
     @OneToOne
