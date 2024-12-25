@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: sis
+  datasource:
+    url: ${DB_HOST}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+config:
+  secret-key: ${JWT_KEY}
+
+logging:
+  level:
+    org.springframework.security: TRACE

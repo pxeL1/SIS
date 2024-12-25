@@ -11,12 +11,12 @@ public class Course {
     private String description;
 
     @ManyToOne
-    private Professor professor;
+    private User professor;
 
     public Course() {
     }
 
-    public Course(String name, String description, Professor professor) {
+    public Course(String name, String description, User professor) {
         this.name = name;
         this.description = description;
         this.professor = professor;
@@ -46,11 +46,11 @@ public class Course {
         this.description = description;
     }
 
-    public Professor getProfessor() {
+    public User getProfessor() {
         return professor;
     }
 
-    public void setProfessor(Professor professor) {
+    public void setProfessor(User professor) {
         this.professor = professor;
     }
 }
