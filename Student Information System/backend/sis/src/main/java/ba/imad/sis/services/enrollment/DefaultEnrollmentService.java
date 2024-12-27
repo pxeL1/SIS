@@ -37,7 +37,8 @@ public class DefaultEnrollmentService implements EnrollmentService {
 
         if(!exists) {
             enrollmentRepository.save(enrollment);
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Enrollment for this course already exists");
         }
     }
