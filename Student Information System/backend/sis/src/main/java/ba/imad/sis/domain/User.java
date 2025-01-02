@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
 @Table(name = "sis_user")
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
     @JsonIgnore
@@ -24,8 +25,7 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String email, String password, String role) {
-        this.id = id;
+    public User(String email, String password, String role) {
         this.email = email;
         this.password = password;
         this.role = role;
@@ -49,7 +49,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        return Arrays.stream(role.split(",")).map(SimpleGrantedAuthority::new).toList();
     }
 
     @Override

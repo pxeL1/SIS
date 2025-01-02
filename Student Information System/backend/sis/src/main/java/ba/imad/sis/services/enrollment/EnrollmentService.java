@@ -1,14 +1,18 @@
 package ba.imad.sis.services.enrollment;
 
 import ba.imad.sis.domain.Enrollment;
+import ba.imad.sis.dtos.EnrollmentUpdateRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface EnrollmentService {
-    List<Enrollment> getAllEnrollments();
-    List<Enrollment> getEnrollmentsByStudentId(Long studentId);
-    List<Enrollment> getEnrollmentsByCourseId(Long courseId);
-    void saveEnrollment(Enrollment enrollment);
-    void deleteEnrollmentById(Long id);
-    void updateEnrollment(Enrollment newEnrollment);
+    Page<Enrollment> getAllEnrollments(int pageNo, int pageSize);
+    Page<Enrollment> getAllEnrollmentsByStudentId(Long studentId, int pageNo, int pageSize);
+    Page<Enrollment> getAllEnrollmentsByCourseId(Long courseId, int pageNo, int pageSize);
+    Enrollment saveEnrollment(Enrollment enrollment);
+    void deleteEnrollment(Long id);
+    void deleteAllStudentEnrollments(Long studentId);
+    void deleteAllCourseEnrollments(Long courseId);
+    void updateEnrollment(EnrollmentUpdateRequest enrollmentUpdateRequest, Long id);
 }

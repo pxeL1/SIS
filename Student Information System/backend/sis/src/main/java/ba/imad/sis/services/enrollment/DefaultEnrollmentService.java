@@ -1,8 +1,12 @@
 package ba.imad.sis.services.enrollment;
 
 import ba.imad.sis.domain.Enrollment;
+import ba.imad.sis.dtos.EnrollmentUpdateRequest;
 import ba.imad.sis.repositories.EnrollmentRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -17,22 +21,28 @@ public class DefaultEnrollmentService implements EnrollmentService {
     }
 
     @Override
-    public List<Enrollment> getAllEnrollments() {
-        return enrollmentRepository.findAll();
+    public Page<Enrollment> getAllEnrollments(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return enrollmentRepository.findAll(pageable);
     }
 
     @Override
-    public List<Enrollment> getEnrollmentsByStudentId(Long studentId) {
-        return enrollmentRepository.findEnrollmentsByStudentId(studentId).orElse(Collections.emptyList());
+    public Page<Enrollment> getAllEnrollmentsByStudentId(Long studentId, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return enrollmentRepository.findAllByStudentId(studentId, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public List<Enrollment> getEnrollmentsByCourseId(Long courseId) {
-        return enrollmentRepository.findEnrollmentsByCourseId(courseId).orElse(Collections.emptyList());
+    public Page<Enrollment> getAllEnrollmentsByCourseId(Long courseId, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return enrollmentRepository.findAllByCourseId(courseId, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public void saveEnrollment(Enrollment enrollment) {
+    public Enrollment saveEnrollment(Enrollment enrollment) {
         boolean exists = enrollmentRepository.existsByStudentIdAndCourseId(enrollment.getStudent().getId(), enrollment.getCourse().getId());
 
         if(!exists) {
@@ -41,31 +51,51 @@ public class DefaultEnrollmentService implements EnrollmentService {
         else {
             throw new IllegalArgumentException("Enrollment for this course already exists");
         }
+
+        return enrollment;
     }
 
     @Override
-    public void deleteEnrollmentById(Long id) {
+    public void deleteEnrollment(Long id) {
         boolean exists = enrollmentRepository.existsById(id);
 
         if(!exists) {
             throw new IllegalArgumentException("Enrollment for this course does not exist");
         }
+
         enrollmentRepository.deleteById(id);
     }
 
     @Override
+    public void deleteAllStudentEnrollments(Long studentId) {
+        boolean exists = enrollmentRepository.existsByStudentId(studentId);
+
+        if(!exists) {
+            throw new IllegalArgumentException("Enrollment for this student does not exist");
+        }
+
+        enrollmentRepository.deleteAllByStudentId(studentId);
+    }
+
+    @Override
+    public void deleteAllCourseEnrollments(Long courseId) {
+        boolean exists = enrollmentRepository.existsByCourseId(courseId);
+
+        if(!exists) {
+            throw new IllegalArgumentException("Enrollment for this course does not exist");
+        }
+
+        enrollmentRepository.deleteAllByCourseId(courseId);
+    }
+
+    @Override
     @Transactional
-    public void updateEnrollment(Enrollment newEnrollment) {
-        Enrollment existingEnrollment = enrollmentRepository.findById(newEnrollment.getId()).orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
+    public void updateEnrollment(EnrollmentUpdateRequest enrollmentUpdateRequest, Long id) {
+        Enrollment oldEnrollment = enrollmentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
 
-        if(newEnrollment.getPoints() != null &&
-                !newEnrollment.getPoints().equals(existingEnrollment.getPoints())) {
-            existingEnrollment.setPoints(newEnrollment.getPoints());
-        }
+        oldEnrollment.setPoints(enrollmentUpdateRequest.points());
+        oldEnrollment.setGrade(enrollmentUpdateRequest.grade());
 
-        if(newEnrollment.getGrade() != null &&
-                !newEnrollment.getGrade().equals(existingEnrollment.getGrade())) {
-            existingEnrollment.setGrade(newEnrollment.getGrade());
-        }
+        enrollmentRepository.save(oldEnrollment);
     }
 }

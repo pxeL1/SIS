@@ -1,14 +1,11 @@
 package ba.imad.sis.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class StudentInformation {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String firstName;
     private String lastName;
@@ -20,8 +17,7 @@ public class StudentInformation {
     public StudentInformation() {
     }
 
-    public StudentInformation(Long id, String firstName, String lastName, String index, Integer enrollmentYear, User student) {
-        this.id = id;
+    public StudentInformation(String firstName, String lastName, String index, Integer enrollmentYear, User student) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.index = index;

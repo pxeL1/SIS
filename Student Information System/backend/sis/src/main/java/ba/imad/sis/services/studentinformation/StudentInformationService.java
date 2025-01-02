@@ -1,13 +1,14 @@
 package ba.imad.sis.services.studentinformation;
 
 import ba.imad.sis.domain.StudentInformation;
+import ba.imad.sis.dtos.StudentUpdateRequest;
 
 import java.util.List;
 
 public interface StudentInformationService {
     List<StudentInformation> getAllStudentInformation();
     StudentInformation getStudentInformation(Long studentId);
-    void saveStudentInformation(StudentInformation studentInformation);
+    StudentInformation saveStudentInformation(StudentInformation studentInformation);
     void deleteStudentInformation(Long studentId);
-    void updateStudentInformation(StudentInformation studentInformation);
+    void updateStudentInformation(Long studentId, StudentUpdateRequest request);
 }

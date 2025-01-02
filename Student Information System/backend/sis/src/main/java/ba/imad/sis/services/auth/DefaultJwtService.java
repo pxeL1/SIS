@@ -27,7 +27,7 @@ public class DefaultJwtService implements JwtService {
 
     @Override
     public String createToken(User user){
-        Claims claims = Jwts.claims().subject(user.getEmail()).build();
+        Claims claims = Jwts.claims().subject(user.getEmail()).add("roles", user.getAuthorities()).build();
         return Jwts.builder()
                 .claims(claims)
                 .expiration(Date.from(Instant.now().plus(EXPIRATION_TIME)))
@@ -60,11 +60,6 @@ public class DefaultJwtService implements JwtService {
     @Override
     public boolean validateExpiration(Claims claims) {
         return claims.getExpiration().after(new Date());
-    }
-
-    @Override
-    public String getEmail(Claims claims) {
-        return claims.getSubject();
     }
 
     private Key getSignInKey() {

@@ -1,22 +1,19 @@
 package ba.imad.sis.domain;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class Enrollment {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer points = 0;
     @Nullable
     private Integer grade;
-    @OneToOne
+    @ManyToOne
     private Course course;
-    @OneToOne
+    @ManyToOne
     private User student;
 
     public Enrollment(Integer points, @Nullable Integer grade, Course course, User student) {

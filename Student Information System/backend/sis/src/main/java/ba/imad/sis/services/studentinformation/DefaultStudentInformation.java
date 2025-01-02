@@ -1,6 +1,8 @@
 package ba.imad.sis.services.studentinformation;
 
 import ba.imad.sis.domain.StudentInformation;
+import ba.imad.sis.domain.User;
+import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.repositories.StudentInformationRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -22,19 +24,18 @@ public class DefaultStudentInformation implements StudentInformationService {
 
     @Override
     public StudentInformation getStudentInformation(Long studentId){
-        return studentInformationRepository.findByStudentId(studentId).orElse(null);
+        return studentInformationRepository.findByStudentId(studentId).orElseThrow(() -> new RuntimeException("Student not found"));
     }
 
     @Override
-    public void saveStudentInformation(StudentInformation studentInformation) {
+    public StudentInformation saveStudentInformation(StudentInformation studentInformation) {
         boolean exists = studentInformationRepository.existsByStudentId(studentInformation.getStudent().getId());
 
-        if(!exists){
-            studentInformationRepository.save(studentInformation);
-        }
-        else {
+        if(exists){
             throw new IllegalArgumentException("Student information already exists");
         }
+
+        return studentInformationRepository.save(studentInformation);
     }
 
     @Override
@@ -49,14 +50,14 @@ public class DefaultStudentInformation implements StudentInformationService {
 
     @Override
     @Transactional
-    public void updateStudentInformation(StudentInformation newStudentInformation) {
-        StudentInformation oldStudentInformation = getStudentInformation(newStudentInformation.getStudent().getId());
+    public void updateStudentInformation(Long studentId, StudentUpdateRequest studentUpdateRequest) {
+        StudentInformation oldStudentInformation = getStudentInformation(studentId);
 
-        oldStudentInformation.setFirstName(newStudentInformation.getFirstName());
-        oldStudentInformation.setLastName(newStudentInformation.getLastName());
-        oldStudentInformation.setIndex(newStudentInformation.getIndex());
-        oldStudentInformation.setEnrollmentYear(newStudentInformation.getEnrollmentYear());
-        oldStudentInformation.setStudent(newStudentInformation.getStudent());
+        oldStudentInformation.setFirstName(studentUpdateRequest.firstName());
+        oldStudentInformation.setLastName(studentUpdateRequest.lastName());
+        oldStudentInformation.setIndex(studentUpdateRequest.index());
+        oldStudentInformation.setEnrollmentYear(studentUpdateRequest.enrollmentYear());
+
         studentInformationRepository.save(oldStudentInformation);
     }
 }

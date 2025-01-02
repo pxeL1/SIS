@@ -1,14 +1,18 @@
 package ba.imad.sis.services.course;
 
 import ba.imad.sis.domain.Course;
+import ba.imad.sis.dtos.CourseUpdateRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseService {
-    List<Course> getAllCourses();
+    Page<Course> getAllCourses(int pageNo, int pageSize);
     Course getCourseById(Long id);
-    List<Course> getCoursesByProfessorId(Long id);
-    void saveCourse(Course course);
-    void deleteCourseById(Long id);
-    void updateCourse(Course newCourse);
+    Page<Course> getCoursesByProfessorId(Long id, int pageNo, int pageSize);
+    Course saveCourse(Course course);
+    void deleteCourse(Long id);
+    void updateCourse(CourseUpdateRequest newCourse, Long courseId);
+    void updateProfessorToNull(Long professorId);
 }

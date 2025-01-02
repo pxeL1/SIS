@@ -11,5 +11,4 @@ public interface JwtService {
     Claims resolveClaims(String token) throws JwtException;
     String extractToken(String bearerToken);
     boolean validateExpiration(Claims claims);
-    String getEmail(Claims claims);
 }

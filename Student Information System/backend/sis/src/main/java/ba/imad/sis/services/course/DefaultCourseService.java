@@ -1,14 +1,14 @@
 package ba.imad.sis.services.course;
 
 import ba.imad.sis.domain.Course;
+import ba.imad.sis.dtos.CourseUpdateRequest;
 import ba.imad.sis.repositories.CourseRepository;
+import ba.imad.sis.repositories.EnrollmentRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 public class DefaultCourseService  implements CourseService {
@@ -20,22 +20,26 @@ public class DefaultCourseService  implements CourseService {
     }
 
     @Override
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public Page<Course> getAllCourses(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return courseRepository.findAll(pageable);
     }
 
     @Override
     public Course getCourseById(Long id) {
-        return courseRepository.findById(id).orElse(null);
+        return courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
     }
 
     @Override
-    public List<Course> getCoursesByProfessorId(Long id) {
-        return courseRepository.getCoursesByProfessorId(id).orElse(Collections.emptyList());
+    public Page<Course> getCoursesByProfessorId(Long id, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return courseRepository.findAllByProfessorId(id, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public void saveCourse(Course course) {
+    public Course saveCourse(Course course) {
         boolean exists = courseRepository.existsByName(course.getName());
 
         if (!exists) {
@@ -43,37 +47,40 @@ public class DefaultCourseService  implements CourseService {
         } else {
             throw new IllegalStateException("Course with name " + course.getName() + "already exists");
         }
+
+        return course;
     }
 
     @Override
-    public void deleteCourseById(Long id) {
+    public void deleteCourse(Long id) {
         boolean exists = courseRepository.existsById(id);
+
         if (!exists) {
             throw new IllegalStateException("Course with id " + id + " does not exist");
         }
+
         courseRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void updateCourse(Course newCourse) {
-        Course course = courseRepository.findById(newCourse.getId()).orElseThrow(() -> new IllegalStateException("Course with id " + newCourse.getId() + " does not exist"));
+    public void updateCourse(CourseUpdateRequest newCourse, Long courseId) {
+        Course oldCourse = getCourseById(courseId);
 
-        if(newCourse.getName() != null &&
-                !newCourse.getName().isEmpty() &&
-                !newCourse.getName().equals(course.getName())) {
-            course.setName(newCourse.getName());
+        oldCourse.setName(newCourse.name());
+        oldCourse.setDescription(newCourse.description());
+        oldCourse.setProfessor(newCourse.professor());
+        courseRepository.save(oldCourse);
+    }
+
+    @Override
+    public void updateProfessorToNull(Long professorId) {
+        boolean exists = courseRepository.existsByProfessorId(professorId);
+
+        if (!exists) {
+            throw new IllegalStateException("Course with professorId " + professorId + " does not exist");
         }
 
-        if(newCourse.getDescription() != null &&
-                !newCourse.getDescription().isEmpty() &&
-                !newCourse.getDescription().equals(course.getDescription())) {
-            course.setDescription(newCourse.getDescription());
-        }
-
-        if(newCourse.getProfessor() != null &&
-                !Objects.equals(newCourse.getProfessor(), course.getProfessor())) {
-            course.setProfessor(newCourse.getProfessor());
-        }
+        //todo:update professor column after deleting a professor
     }
 }
