@@ -10,9 +10,7 @@ import java.util.Optional;
 public interface CourseService {
     Page<Course> getAllCourses(int pageNo, int pageSize);
     Course getCourseById(Long id);
-    Page<Course> getCoursesByProfessorId(Long id, int pageNo, int pageSize);
     Course saveCourse(Course course);
     void deleteCourse(Long id);
     void updateCourse(CourseUpdateRequest newCourse, Long courseId);
-    void updateProfessorToNull(Long professorId);
 }

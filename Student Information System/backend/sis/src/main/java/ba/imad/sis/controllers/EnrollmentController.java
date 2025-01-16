@@ -3,10 +3,9 @@ package ba.imad.sis.controllers;
 import ba.imad.sis.domain.Enrollment;
 import ba.imad.sis.dtos.EnrollmentUpdateRequest;
 import ba.imad.sis.services.enrollment.EnrollmentService;
-import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/enrollment")
@@ -17,39 +16,50 @@ public class EnrollmentController {
         this.enrollmentService = enrollmentService;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping
-    public Page<Enrollment> getEnrollments(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return enrollmentService.getAllEnrollments(pageNo, pageSize);
+    public ResponseEntity getEnrollments(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(enrollmentService.getAllEnrollments(pageNo, pageSize));
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "/student/{studentId}")
-    public Page<Enrollment> getEnrollmentsByStudentId(@PathVariable("studentId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return enrollmentService.getAllEnrollmentsByStudentId(id, pageNo, pageSize);
+    public ResponseEntity getEnrollmentsByStudentId(@PathVariable("studentId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByStudentId(id, pageNo, pageSize));
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "/course/{courseId}")
-    public Page<Enrollment> getEnrollmentsByCourseId(@PathVariable("courseId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return enrollmentService.getAllEnrollmentsByCourseId(id, pageNo, pageSize);
+    public ResponseEntity getEnrollmentsByCourseId(@PathVariable("courseId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByCourseId(id, pageNo, pageSize));
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping
-    public Enrollment saveEnrollment(@RequestBody Enrollment enrollment) {
-        return enrollmentService.saveEnrollment(enrollment);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity saveEnrollment(@RequestBody Enrollment enrollment) {
+        try {
+            return ResponseEntity.ok(enrollmentService.saveEnrollment(enrollment));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping(value = "/{id}")
-    public void deleteEnrollment(@PathVariable("id") Long id) {
-        enrollmentService.deleteEnrollment(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity deleteEnrollment(@PathVariable("id") Long id) {
+        try {
+            enrollmentService.deleteEnrollment(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping(value = "/{id}")
-    public void updateEnrollment(@PathVariable("id") Long id, @RequestBody EnrollmentUpdateRequest enrollment) {
-        enrollmentService.updateEnrollment(enrollment, id);
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or hasRole('DEMONSTRATOR')")
+    public ResponseEntity updateEnrollment(@PathVariable("id") Long id, @RequestBody EnrollmentUpdateRequest enrollment) {
+        try {
+            enrollmentService.updateEnrollment(enrollment, id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

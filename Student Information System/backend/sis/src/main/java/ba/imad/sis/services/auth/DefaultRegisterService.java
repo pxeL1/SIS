@@ -1,4 +1,4 @@
-package ba.imad.sis.services.user;
+package ba.imad.sis.services.auth;
 
 import ba.imad.sis.domain.ProfessorInformation;
 import ba.imad.sis.domain.StudentInformation;
@@ -35,6 +35,7 @@ public class DefaultRegisterService implements RegisterService {
         }
 
         User user = new User(registerRequest.email(), passwordEncoder.encode(registerRequest.password()), registerRequest.role());
+        userRepository.save(user);
 
         if(Arrays.asList(user.getRole().split(",")).contains("STUDENT")){
             StudentInformation studentInformation = new StudentInformation(registerRequest.firstName(), registerRequest.lastName(), registerRequest.index(), registerRequest.enrollmentYear(), user);
@@ -47,6 +48,6 @@ public class DefaultRegisterService implements RegisterService {
             professorInformationService.saveProfessorInformation(professorInformation);
         }
 
-        return userRepository.save(user);
+        return user;
     }
 }

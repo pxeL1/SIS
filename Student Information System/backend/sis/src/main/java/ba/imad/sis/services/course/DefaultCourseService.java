@@ -3,7 +3,8 @@ package ba.imad.sis.services.course;
 import ba.imad.sis.domain.Course;
 import ba.imad.sis.dtos.CourseUpdateRequest;
 import ba.imad.sis.repositories.CourseRepository;
-import ba.imad.sis.repositories.EnrollmentRepository;
+import ba.imad.sis.services.enrollment.EnrollmentService;
+import ba.imad.sis.services.teachingassignment.TeachingAssignmentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,9 +15,13 @@ import org.springframework.stereotype.Service;
 public class DefaultCourseService  implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final EnrollmentService enrollmentService;
+    private final TeachingAssignmentService teachingAssignmentService;
 
-    public DefaultCourseService(CourseRepository courseRepository) {
+    public DefaultCourseService(CourseRepository courseRepository, EnrollmentService enrollmentService, TeachingAssignmentService teachingAssignmentService) {
         this.courseRepository = courseRepository;
+        this.enrollmentService = enrollmentService;
+        this.teachingAssignmentService = teachingAssignmentService;
     }
 
     @Override
@@ -32,32 +37,29 @@ public class DefaultCourseService  implements CourseService {
     }
 
     @Override
-    public Page<Course> getCoursesByProfessorId(Long id, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
-        return courseRepository.findAllByProfessorId(id, pageable).orElse(Page.empty(pageable));
-    }
-
-    @Override
     public Course saveCourse(Course course) {
         boolean exists = courseRepository.existsByName(course.getName());
 
         if (!exists) {
             courseRepository.save(course);
         } else {
-            throw new IllegalStateException("Course with name " + course.getName() + "already exists");
+            throw new IllegalStateException("Course with name " + course.getName() + " already exists");
         }
 
         return course;
     }
 
     @Override
+    @Transactional
     public void deleteCourse(Long id) {
         boolean exists = courseRepository.existsById(id);
 
         if (!exists) {
             throw new IllegalStateException("Course with id " + id + " does not exist");
         }
+
+        teachingAssignmentService.deleteAllCourseTeachingAssignments(id);
+        enrollmentService.deleteAllCourseEnrollments(id);
 
         courseRepository.deleteById(id);
     }
@@ -69,18 +71,6 @@ public class DefaultCourseService  implements CourseService {
 
         oldCourse.setName(newCourse.name());
         oldCourse.setDescription(newCourse.description());
-        oldCourse.setProfessor(newCourse.professor());
         courseRepository.save(oldCourse);
-    }
-
-    @Override
-    public void updateProfessorToNull(Long professorId) {
-        boolean exists = courseRepository.existsByProfessorId(professorId);
-
-        if (!exists) {
-            throw new IllegalStateException("Course with professorId " + professorId + " does not exist");
-        }
-
-        //todo:update professor column after deleting a professor
     }
 }

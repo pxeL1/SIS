@@ -10,6 +10,4 @@ import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
     boolean existsByName(String name);
-    boolean existsByProfessorId(Long professorId);
-    Optional<Page<Course>> findAllByProfessorId(Long professorId, Pageable pageable);
 }

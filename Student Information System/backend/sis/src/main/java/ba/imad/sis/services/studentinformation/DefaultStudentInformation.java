@@ -1,7 +1,6 @@
 package ba.imad.sis.services.studentinformation;
 
 import ba.imad.sis.domain.StudentInformation;
-import ba.imad.sis.domain.User;
 import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.repositories.StudentInformationRepository;
 import jakarta.transaction.Transactional;

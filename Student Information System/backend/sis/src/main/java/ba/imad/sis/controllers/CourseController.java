@@ -4,56 +4,62 @@ import ba.imad.sis.domain.Course;
 import ba.imad.sis.dtos.CourseUpdateRequest;
 import ba.imad.sis.services.course.CourseService;
 import ba.imad.sis.services.enrollment.EnrollmentService;
-import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/course")
 public class CourseController {
     private final CourseService courseService;
-    private final EnrollmentService enrollmentService;
 
-    public CourseController(CourseService courseService, EnrollmentService enrollmentService) {
+    public CourseController(CourseService courseService) {
         this.courseService = courseService;
-        this.enrollmentService = enrollmentService;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping
-    public Page<Course> getAllCourses(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return courseService.getAllCourses(pageNo, pageSize);
+    public ResponseEntity getAllCourses(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(courseService.getAllCourses(pageNo, pageSize));
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping(value = "/{id}")
-    public Course getCourseById(@PathVariable("id") Long id) {
-        return courseService.getCourseById(id);
+    public ResponseEntity getCourseById(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(courseService.getCourseById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
-    @GetMapping(value = "/professor/{professorId}")
-    public Page<Course> getCoursesByProfessorId(@PathVariable("professorId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return courseService.getCoursesByProfessorId(id, pageNo, pageSize);
-    }
-
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping
-    public Course saveCourse(@RequestBody Course course) {
-        return courseService.saveCourse(course);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity saveCourse(@RequestBody Course course) {
+        try{
+            return ResponseEntity.ok(courseService.saveCourse(course));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping(value = "/{id}")
-    public void deleteCourseById(@PathVariable("id") Long id) {
-        enrollmentService.deleteAllCourseEnrollments(id);
-        courseService.deleteCourse(id);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity deleteCourseById(@PathVariable("id") Long id) {
+        try {
+            courseService.deleteCourse(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping(value = "/{id}")
-    public void updateCourseById(@RequestBody CourseUpdateRequest course, @PathVariable("id") Long id) {
-        courseService.updateCourse(course, id);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity updateCourseById(@RequestBody CourseUpdateRequest course, @PathVariable("id") Long id) {
+        try {
+            courseService.updateCourse(course, id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

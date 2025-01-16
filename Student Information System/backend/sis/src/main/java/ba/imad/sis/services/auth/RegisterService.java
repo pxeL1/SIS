@@ -1,4 +1,4 @@
-package ba.imad.sis.services.user;
+package ba.imad.sis.services.auth;
 
 import ba.imad.sis.domain.User;
 import ba.imad.sis.dtos.RegisterRequest;

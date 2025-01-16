@@ -5,6 +5,7 @@ import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.services.professorinformation.ProfessorInformationService;
 import ba.imad.sis.services.studentinformation.StudentInformationService;
 import ba.imad.sis.services.user.DefaultUserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,32 +22,43 @@ public class UserController {
         this.professorInformationService = professorInformationService;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping
     @PreAuthorize("isAuthenticated()")
-    public void updatePassword(@RequestBody String password) {
+    public ResponseEntity updatePassword(@RequestBody String password) {
         userService.updatePassword(userService.getCurrentUser(), password);
+        return ResponseEntity.ok().build();
     }
 
-
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping(value = "/student/{id}")
     @PreAuthorize("isAuthenticated()")
-    public void updateStudent(@PathVariable("id") Long id, @RequestBody StudentUpdateRequest studentUpdateRequest) {
-        studentInformationService.updateStudentInformation(id, studentUpdateRequest);
+    public ResponseEntity updateStudent(@PathVariable("id") Long id, @RequestBody StudentUpdateRequest studentUpdateRequest) {
+        try {
+            studentInformationService.updateStudentInformation(id, studentUpdateRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PutMapping(value = "/professor/{id}")
     @PreAuthorize("isAuthenticated()")
-    public void updateProfessor(@PathVariable("id") Long id, @RequestBody ProfessorUpdateRequest professorUpdateRequest) {
-        professorInformationService.updateProfessorInformation(id, professorUpdateRequest);
+    public ResponseEntity updateProfessor(@PathVariable("id") Long id, @RequestBody ProfessorUpdateRequest professorUpdateRequest) {
+        try {
+            professorInformationService.updateProfessorInformation(id, professorUpdateRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity deleteUser(@PathVariable("id") Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

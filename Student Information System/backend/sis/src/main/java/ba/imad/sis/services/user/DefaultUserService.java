@@ -1,14 +1,12 @@
 package ba.imad.sis.services.user;
 
-import ba.imad.sis.domain.ProfessorInformation;
-import ba.imad.sis.domain.StudentInformation;
+
 import ba.imad.sis.domain.User;
-import ba.imad.sis.dtos.RegisterRequest;
 import ba.imad.sis.repositories.UserRepository;
-import ba.imad.sis.services.course.CourseService;
 import ba.imad.sis.services.enrollment.EnrollmentService;
 import ba.imad.sis.services.professorinformation.ProfessorInformationService;
 import ba.imad.sis.services.studentinformation.StudentInformationService;
+import ba.imad.sis.services.teachingassignment.TeachingAssignmentService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,14 +22,16 @@ public class DefaultUserService implements UserDetailsService {
     private final StudentInformationService studentInformationService;
     private final ProfessorInformationService professorInformationService;
     private final EnrollmentService enrollmentService;
-    private final CourseService courseService;
+    private final TeachingAssignmentService teachingAssignmentService;
+    private final PasswordEncoder passwordEncoder;
 
-    public DefaultUserService(UserRepository userRepository, StudentInformationService studentInformationService, ProfessorInformationService professorInformationService, EnrollmentService enrollmentService, CourseService courseService) {
+    public DefaultUserService(UserRepository userRepository, StudentInformationService studentInformationService, ProfessorInformationService professorInformationService, EnrollmentService enrollmentService, PasswordEncoder passwordEncoder, TeachingAssignmentService teachingAssignmentService) {
         this.userRepository = userRepository;
         this.studentInformationService = studentInformationService;
         this.professorInformationService = professorInformationService;
         this.enrollmentService = enrollmentService;
-        this.courseService = courseService;
+        this.passwordEncoder = passwordEncoder;
+        this.teachingAssignmentService = teachingAssignmentService;
     }
 
     @Override
@@ -53,11 +53,12 @@ public class DefaultUserService implements UserDetailsService {
 
     @Transactional
     public void updatePassword(User user, String newPassword) {
-        user.setPassword(newPassword);
+        user.setPassword(passwordEncoder.encode(newPassword));
 
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUser(Long id){
         User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user found with id: " + id));
 
@@ -67,7 +68,7 @@ public class DefaultUserService implements UserDetailsService {
         }
         else if(Arrays.asList(user.getRole().split(",")).contains("PROFESSOR")){
             professorInformationService.deleteProfessorInformation(id);
-            courseService.updateProfessorToNull(id);
+            teachingAssignmentService.deleteAllProfessorTeachingAssignments(id);
         }
 
         userRepository.delete(user);

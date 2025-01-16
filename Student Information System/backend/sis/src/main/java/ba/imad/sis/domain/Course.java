@@ -8,20 +8,17 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
     private String name;
+    @Column(length = 1024)
     private String description;
-
-    @ManyToOne
-    @Nullable
-    private User professor;
 
     public Course() {
     }
 
-    public Course(String name, String description, User professor) {
+    public Course(String name, String description) {
         this.name = name;
         this.description = description;
-        this.professor = professor;
     }
 
     public Long getId() {
@@ -46,13 +43,5 @@ public class Course {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public User getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(User professor) {
-        this.professor = professor;
     }
 }
