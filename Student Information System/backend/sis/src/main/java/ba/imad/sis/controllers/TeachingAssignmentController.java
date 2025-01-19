@@ -1,11 +1,14 @@
 package ba.imad.sis.controllers;
 
 import ba.imad.sis.domain.TeachingAssignment;
+import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.TeachingAssignmentUpdateRequest;
 import ba.imad.sis.services.teachingassignment.TeachingAssignmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/teaching")
@@ -38,6 +41,11 @@ public class TeachingAssignmentController {
     @GetMapping(value = "/course/{id}")
     public ResponseEntity getTeachingAssignmentsByCourseId(@PathVariable("id") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
         return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignmentsByCourseId(id, pageNo, pageSize));
+    }
+
+    @GetMapping(value = "/filtered")
+    public ResponseEntity getFilteredTeachingAssignments(List<FilterDTO> filterDTOList, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(teachingAssignmentService.getFilteredTeachingAssignments(filterDTOList, pageNo, pageSize));
     }
 
     @PostMapping

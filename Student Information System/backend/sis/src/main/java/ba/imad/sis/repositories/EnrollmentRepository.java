@@ -4,10 +4,11 @@ import ba.imad.sis.domain.Enrollment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
+public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, JpaSpecificationExecutor<Enrollment> {
     Optional<Page<Enrollment>> findAllByStudentId(Long studentId, Pageable pageable);
     Optional<Page<Enrollment>> findAllByCourseId(Long courseId, Pageable pageable);
     boolean existsByStudentIdAndCourseId(Long studentId, Long courseId);

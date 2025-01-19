@@ -3,6 +3,7 @@ package ba.imad.sis.services.enrollment;
 import ba.imad.sis.domain.Enrollment;
 import ba.imad.sis.dtos.EnrollmentUpdateRequest;
 import ba.imad.sis.repositories.EnrollmentRepository;
+import ba.imad.sis.specifications.StudentSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,13 @@ public class DefaultEnrollmentService implements EnrollmentService {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         return enrollmentRepository.findAllByCourseId(courseId, pageable).orElse(Page.empty(pageable));
+    }
+
+    @Override
+    public Page<Enrollment> getFilteredEnrollments(int grade, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return enrollmentRepository.findAll(StudentSpecification.gradeEquals(grade), pageable);
     }
 
     @Override

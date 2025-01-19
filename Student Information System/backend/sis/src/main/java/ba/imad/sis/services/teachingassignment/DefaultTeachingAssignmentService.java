@@ -1,13 +1,17 @@
 package ba.imad.sis.services.teachingassignment;
 
 import ba.imad.sis.domain.TeachingAssignment;
+import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.TeachingAssignmentUpdateRequest;
 import ba.imad.sis.repositories.TeachingAssignmentRepository;
+import ba.imad.sis.specifications.ProfessorSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DefaultTeachingAssignmentService implements TeachingAssignmentService {
@@ -38,6 +42,12 @@ public class DefaultTeachingAssignmentService implements TeachingAssignmentServi
     public Page<TeachingAssignment> getTeachingAssignmentsByCourseId(Long courseId, int pageNo, int pageSize) {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         return teachingAssignmentRepository.findAllByCourseId(courseId, pageable).orElse(Page.empty(pageable));
+    }
+
+    @Override
+    public Page<TeachingAssignment> getFilteredTeachingAssignments(List<FilterDTO> filterDTO, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return teachingAssignmentRepository.findAll(ProfessorSpecification.columnEqualsTeachingAssignment(filterDTO), pageable);
     }
 
     @Override

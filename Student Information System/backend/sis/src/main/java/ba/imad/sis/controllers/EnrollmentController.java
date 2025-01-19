@@ -31,6 +31,11 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByCourseId(id, pageNo, pageSize));
     }
 
+    @GetMapping(value = "/filter")
+    public ResponseEntity getFilteredEnrollments(@RequestParam int grade, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(enrollmentService.getFilteredEnrollments(grade, pageNo, pageSize));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity saveEnrollment(@RequestBody Enrollment enrollment) {

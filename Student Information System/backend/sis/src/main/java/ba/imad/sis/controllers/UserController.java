@@ -1,5 +1,6 @@
 package ba.imad.sis.controllers;
 
+import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.ProfessorUpdateRequest;
 import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.services.professorinformation.ProfessorInformationService;
@@ -8,6 +9,8 @@ import ba.imad.sis.services.user.DefaultUserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -27,6 +30,30 @@ public class UserController {
     public ResponseEntity updatePassword(@RequestBody String password) {
         userService.updatePassword(userService.getCurrentUser(), password);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/student")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getAllStudents(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(studentInformationService.getAllStudentInformation(pageNo, pageSize));
+    }
+
+    @GetMapping(value = "/student/filter")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getAllFilteredStudents(@RequestBody List<FilterDTO> filterDTO, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(studentInformationService.getFilteredStudentInformation(filterDTO, pageNo, pageSize));
+    }
+
+    @GetMapping(value = "/professor")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getAllProfessors(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(professorInformationService.getAllProfessorInformation(pageNo, pageSize));
+    }
+
+    @GetMapping(value = "/professor/filter")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity getAllFilteredProfessors(@RequestBody List<FilterDTO> filterDTO, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(professorInformationService.getFilteredProfessorInformation(filterDTO, pageNo, pageSize));
     }
 
     @PutMapping(value = "/student/{id}")

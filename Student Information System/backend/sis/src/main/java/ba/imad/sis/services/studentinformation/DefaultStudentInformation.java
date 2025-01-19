@@ -1,9 +1,14 @@
 package ba.imad.sis.services.studentinformation;
 
 import ba.imad.sis.domain.StudentInformation;
+import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.repositories.StudentInformationRepository;
+import ba.imad.sis.specifications.StudentSpecification;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +22,17 @@ public class DefaultStudentInformation implements StudentInformationService {
     }
 
     @Override
-    public List<StudentInformation> getAllStudentInformation() {
-        return studentInformationRepository.findAll();
+    public Page<StudentInformation> getAllStudentInformation(int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return studentInformationRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<StudentInformation> getFilteredStudentInformation(List<FilterDTO> filterDTO, int pageNo, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+        return studentInformationRepository.findAll(StudentSpecification.columnEquals(filterDTO), pageable);
     }
 
     @Override
@@ -27,14 +41,14 @@ public class DefaultStudentInformation implements StudentInformationService {
     }
 
     @Override
-    public StudentInformation saveStudentInformation(StudentInformation studentInformation) {
+    public void saveStudentInformation(StudentInformation studentInformation) {
         boolean exists = studentInformationRepository.existsByStudentId(studentInformation.getStudent().getId());
 
         if(exists){
             throw new IllegalArgumentException("Student information already exists");
         }
 
-        return studentInformationRepository.save(studentInformation);
+        studentInformationRepository.save(studentInformation);
     }
 
     @Override

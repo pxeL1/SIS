@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +24,12 @@ public class DefaultUserService implements UserDetailsService {
     private final ProfessorInformationService professorInformationService;
     private final EnrollmentService enrollmentService;
     private final TeachingAssignmentService teachingAssignmentService;
-    private final PasswordEncoder passwordEncoder;
 
-    public DefaultUserService(UserRepository userRepository, StudentInformationService studentInformationService, ProfessorInformationService professorInformationService, EnrollmentService enrollmentService, PasswordEncoder passwordEncoder, TeachingAssignmentService teachingAssignmentService) {
+    public DefaultUserService(UserRepository userRepository, StudentInformationService studentInformationService, ProfessorInformationService professorInformationService, EnrollmentService enrollmentService, TeachingAssignmentService teachingAssignmentService) {
         this.userRepository = userRepository;
         this.studentInformationService = studentInformationService;
         this.professorInformationService = professorInformationService;
         this.enrollmentService = enrollmentService;
-        this.passwordEncoder = passwordEncoder;
         this.teachingAssignmentService = teachingAssignmentService;
     }
 
@@ -53,6 +52,7 @@ public class DefaultUserService implements UserDetailsService {
 
     @Transactional
     public void updatePassword(User user, String newPassword) {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(newPassword));
 
         userRepository.save(user);
