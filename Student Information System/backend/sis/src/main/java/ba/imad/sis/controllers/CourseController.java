@@ -3,7 +3,7 @@ package ba.imad.sis.controllers;
 import ba.imad.sis.domain.Course;
 import ba.imad.sis.dtos.CourseUpdateRequest;
 import ba.imad.sis.services.course.CourseService;
-import ba.imad.sis.services.enrollment.EnrollmentService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity getAllCourses(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(courseService.getAllCourses(pageNo, pageSize));
+    public ResponseEntity getAllCourses(Pageable pageable) {
+        return ResponseEntity.ok(courseService.getAllCourses(pageable));
     }
 
     @GetMapping(value = "/{id}")

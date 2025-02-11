@@ -1,6 +1,7 @@
 package ba.imad.sis.services.user;
 
 
+import ba.imad.sis.domain.Role;
 import ba.imad.sis.domain.User;
 import ba.imad.sis.repositories.UserRepository;
 import ba.imad.sis.services.enrollment.EnrollmentService;
@@ -14,8 +15,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
 
 @Service
 public class DefaultUserService implements UserDetailsService {
@@ -62,11 +61,11 @@ public class DefaultUserService implements UserDetailsService {
     public void deleteUser(Long id){
         User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("No user found with id: " + id));
 
-        if(Arrays.asList(user.getRole().split(",")).contains("STUDENT")){
+        if(user.getRole().equals(Role.STUDENT)){
             studentInformationService.deleteStudentInformation(id);
             enrollmentService.deleteAllStudentEnrollments(id);
         }
-        else if(Arrays.asList(user.getRole().split(",")).contains("PROFESSOR")){
+        else if(user.getRole().equals(Role.PROFESSOR)){
             professorInformationService.deleteProfessorInformation(id);
             teachingAssignmentService.deleteAllProfessorTeachingAssignments(id);
         }

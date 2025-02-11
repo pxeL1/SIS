@@ -4,6 +4,7 @@ import ba.imad.sis.domain.TeachingAssignment;
 import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.TeachingAssignmentUpdateRequest;
 import ba.imad.sis.services.teachingassignment.TeachingAssignmentService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,8 @@ public class TeachingAssignmentController {
     }
 
     @GetMapping
-    public ResponseEntity getAllTeachingAssignments(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignments(pageNo, pageSize));
+    public ResponseEntity getAllTeachingAssignments(Pageable pageable) {
+        return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignments(pageable));
     }
 
     @GetMapping(value = "/{id}")
@@ -34,22 +35,22 @@ public class TeachingAssignmentController {
     }
 
     @GetMapping(value = "/professor/{id}")
-    public ResponseEntity getTeachingAssignmentByProfessorId(@PathVariable("id") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignmentsByProffessorId(id, pageNo, pageSize));
+    public ResponseEntity getTeachingAssignmentByProfessorId(@PathVariable("id") Long id, Pageable pageable) {
+        return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignmentsByProffessorId(id, pageable));
     }
 
     @GetMapping(value = "/course/{id}")
-    public ResponseEntity getTeachingAssignmentsByCourseId(@PathVariable("id") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignmentsByCourseId(id, pageNo, pageSize));
+    public ResponseEntity getTeachingAssignmentsByCourseId(@PathVariable("id") Long id, Pageable pageable) {
+        return ResponseEntity.ok(teachingAssignmentService.getTeachingAssignmentsByCourseId(id, pageable));
     }
 
-    @GetMapping(value = "/filtered")
-    public ResponseEntity getFilteredTeachingAssignments(List<FilterDTO> filterDTOList, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(teachingAssignmentService.getFilteredTeachingAssignments(filterDTOList, pageNo, pageSize));
+    @PostMapping(value = "/filter")
+    public ResponseEntity getFilteredTeachingAssignments(List<FilterDTO> filterDTOList, Pageable pageable) {
+        return ResponseEntity.ok(teachingAssignmentService.getFilteredTeachingAssignments(filterDTOList, pageable));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity saveTeachingAssignment(@RequestBody TeachingAssignment teachingAssignment) {
         try {
             return ResponseEntity.ok(teachingAssignmentService.saveTeachingAssignment(teachingAssignment));
@@ -69,7 +70,7 @@ public class TeachingAssignmentController {
     }
 
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity updateTeachingAssignment(@RequestBody TeachingAssignmentUpdateRequest teachingAssignmentUpdateRequest, @PathVariable("id") Long id) {
         try {
             teachingAssignmentService.updateTeachingAssignment(teachingAssignmentUpdateRequest, id);

@@ -2,13 +2,15 @@ package ba.imad.sis.services.enrollment;
 
 import ba.imad.sis.domain.Enrollment;
 import ba.imad.sis.dtos.EnrollmentUpdateRequest;
+import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.repositories.EnrollmentRepository;
-import ba.imad.sis.specifications.StudentSpecification;
+import ba.imad.sis.specifications.FilterSpecifications;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DefaultEnrollmentService implements EnrollmentService {
@@ -19,31 +21,23 @@ public class DefaultEnrollmentService implements EnrollmentService {
     }
 
     @Override
-    public Page<Enrollment> getAllEnrollments(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
+    public Page<Enrollment> getAllEnrollments(Pageable pageable) {
         return enrollmentRepository.findAll(pageable);
     }
 
     @Override
-    public Page<Enrollment> getAllEnrollmentsByStudentId(Long studentId, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
+    public Page<Enrollment> getAllEnrollmentsByStudentId(Long studentId, Pageable pageable) {
         return enrollmentRepository.findAllByStudentId(studentId, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public Page<Enrollment> getAllEnrollmentsByCourseId(Long courseId, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
+    public Page<Enrollment> getAllEnrollmentsByCourseId(Long courseId, Pageable pageable) {
         return enrollmentRepository.findAllByCourseId(courseId, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public Page<Enrollment> getFilteredEnrollments(int grade, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
-        return enrollmentRepository.findAll(StudentSpecification.gradeEquals(grade), pageable);
+    public Page<Enrollment> getFilteredEnrollments(List<FilterDTO> filterDTO, Pageable pageable) {
+        return enrollmentRepository.findAll(FilterSpecifications.columnEquals(filterDTO), pageable);
     }
 
     @Override
@@ -102,6 +96,7 @@ public class DefaultEnrollmentService implements EnrollmentService {
 
         oldEnrollment.setPoints(enrollmentUpdateRequest.points());
         oldEnrollment.setGrade(enrollmentUpdateRequest.grade());
+        oldEnrollment.setPassed(enrollmentUpdateRequest.passed());
 
         enrollmentRepository.save(oldEnrollment);
     }

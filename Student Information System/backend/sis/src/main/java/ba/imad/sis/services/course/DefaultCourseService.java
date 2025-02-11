@@ -7,7 +7,6 @@ import ba.imad.sis.services.enrollment.EnrollmentService;
 import ba.imad.sis.services.teachingassignment.TeachingAssignmentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +24,7 @@ public class DefaultCourseService  implements CourseService {
     }
 
     @Override
-    public Page<Course> getAllCourses(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
+    public Page<Course> getAllCourses(Pageable pageable) {
         return courseRepository.findAll(pageable);
     }
 

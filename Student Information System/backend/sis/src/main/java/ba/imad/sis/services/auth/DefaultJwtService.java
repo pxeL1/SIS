@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class DefaultJwtService implements JwtService {
 
     @Override
     public String createToken(User user){
-        Claims claims = Jwts.claims().subject(user.getEmail()).add("roles", user.getAuthorities()).build();
+        Claims claims = Jwts.claims().subject(user.getEmail()).add("role", user.getRole()).build();
         return Jwts.builder()
                 .claims(claims)
                 .expiration(Date.from(Instant.now().plus(EXPIRATION_TIME)))
@@ -60,6 +61,15 @@ public class DefaultJwtService implements JwtService {
     @Override
     public boolean validateExpiration(Claims claims) {
         return claims.getExpiration().after(new Date());
+    }
+
+    @Override
+    public boolean isTokenExpired(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        String token = extractToken(bearerToken);
+        Claims claims = resolveClaims(token);
+
+        return validateExpiration(claims);
     }
 
     private Key getSignInKey() {

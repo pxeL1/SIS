@@ -1,11 +1,13 @@
 package ba.imad.sis.controllers;
 
 import ba.imad.sis.dtos.FilterDTO;
+import ba.imad.sis.dtos.PasswordUpdateRequest;
 import ba.imad.sis.dtos.ProfessorUpdateRequest;
 import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.services.professorinformation.ProfessorInformationService;
 import ba.imad.sis.services.studentinformation.StudentInformationService;
 import ba.imad.sis.services.user.DefaultUserService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -27,33 +29,45 @@ public class UserController {
 
     @PutMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updatePassword(@RequestBody String password) {
-        userService.updatePassword(userService.getCurrentUser(), password);
+    public ResponseEntity updatePassword(@RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        userService.updatePassword(userService.getCurrentUser(), passwordUpdateRequest.password());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping(value = "/student")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity getAllStudents(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(studentInformationService.getAllStudentInformation(pageNo, pageSize));
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllStudents(Pageable pageable) {
+        return ResponseEntity.ok(studentInformationService.getAllStudentInformation(pageable));
     }
 
-    @GetMapping(value = "/student/filter")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity getAllFilteredStudents(@RequestBody List<FilterDTO> filterDTO, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(studentInformationService.getFilteredStudentInformation(filterDTO, pageNo, pageSize));
+    @GetMapping(value = "/student/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getStudent(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(studentInformationService.getStudentInformation(id));
+    }
+
+    @PostMapping(value = "/student/filter")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllFilteredStudents(@RequestBody List<FilterDTO> filterDTO, @RequestBody Pageable pageable) {
+        return ResponseEntity.ok(studentInformationService.getFilteredStudentInformation(filterDTO, pageable));
     }
 
     @GetMapping(value = "/professor")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity getAllProfessors(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(professorInformationService.getAllProfessorInformation(pageNo, pageSize));
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllProfessors(Pageable pageable) {
+        return ResponseEntity.ok(professorInformationService.getAllProfessorInformation(pageable));
     }
 
-    @GetMapping(value = "/professor/filter")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity getAllFilteredProfessors(@RequestBody List<FilterDTO> filterDTO, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(professorInformationService.getFilteredProfessorInformation(filterDTO, pageNo, pageSize));
+    @GetMapping(value = "/professor/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getProfessor(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(professorInformationService.getProfessorInformation(id));
+    }
+
+    @PostMapping(value = "/professor/filter")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity getAllFilteredProfessors(@RequestBody List<FilterDTO> filterDTO, @RequestBody Pageable pageable) {
+        return ResponseEntity.ok(professorInformationService.getFilteredProfessorInformation(filterDTO, pageable));
     }
 
     @PutMapping(value = "/student/{id}")
@@ -79,7 +93,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteUser(@PathVariable("id") Long id) {
         try {
             userService.deleteUser(id);

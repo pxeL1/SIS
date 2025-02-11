@@ -4,10 +4,9 @@ import ba.imad.sis.domain.StudentInformation;
 import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.StudentUpdateRequest;
 import ba.imad.sis.repositories.StudentInformationRepository;
-import ba.imad.sis.specifications.StudentSpecification;
+import ba.imad.sis.specifications.FilterSpecifications;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,17 +21,13 @@ public class DefaultStudentInformation implements StudentInformationService {
     }
 
     @Override
-    public Page<StudentInformation> getAllStudentInformation(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
+    public Page<StudentInformation> getAllStudentInformation(Pageable pageable) {
         return studentInformationRepository.findAll(pageable);
     }
 
     @Override
-    public Page<StudentInformation> getFilteredStudentInformation(List<FilterDTO> filterDTO, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-
-        return studentInformationRepository.findAll(StudentSpecification.columnEquals(filterDTO), pageable);
+    public Page<StudentInformation> getFilteredStudentInformation(List<FilterDTO> filterDTO, Pageable pageable) {
+        return studentInformationRepository.findAll(FilterSpecifications.columnEquals(filterDTO), pageable);
     }
 
     @Override

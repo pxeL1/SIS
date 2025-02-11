@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -21,12 +19,12 @@ public class User implements UserDetails {
     private String email;
     @JsonIgnore
     private String password;
-    private String role;
+    private Role role;
 
     public User() {
     }
 
-    public User(String email, String password, String role) {
+    public User(String email, String password, Role role) {
         this.email = email;
         this.password = password;
         this.role = role;
@@ -50,7 +48,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(role.split(",")).map(SimpleGrantedAuthority::new).toList();
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
@@ -88,11 +86,11 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }

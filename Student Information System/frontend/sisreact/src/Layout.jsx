@@ -1,10 +1,10 @@
 import {Navbar} from "./components/Navbar.jsx";
 import {Outlet} from "react-router-dom";
 
-export function Layout() {
+export function Layout({handleLogout}) {
     return (
         <>
-            <Navbar />
+            <Navbar handleLogout={handleLogout} />
             <main className="flex-grow">
                 <Outlet />
             </main>

@@ -2,10 +2,14 @@ package ba.imad.sis.controllers;
 
 import ba.imad.sis.domain.Enrollment;
 import ba.imad.sis.dtos.EnrollmentUpdateRequest;
+import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.services.enrollment.EnrollmentService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/enrollment")
@@ -17,27 +21,27 @@ public class EnrollmentController {
     }
 
     @GetMapping
-    public ResponseEntity getEnrollments(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(enrollmentService.getAllEnrollments(pageNo, pageSize));
+    public ResponseEntity getEnrollments(Pageable pageable) {
+        return ResponseEntity.ok(enrollmentService.getAllEnrollments(pageable));
     }
 
     @GetMapping(value = "/student/{studentId}")
-    public ResponseEntity getEnrollmentsByStudentId(@PathVariable("studentId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByStudentId(id, pageNo, pageSize));
+    public ResponseEntity getEnrollmentsByStudentId(@PathVariable("studentId") Long id, Pageable pageable) {
+        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByStudentId(id, pageable));
     }
 
     @GetMapping(value = "/course/{courseId}")
-    public ResponseEntity getEnrollmentsByCourseId(@PathVariable("courseId") Long id, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByCourseId(id, pageNo, pageSize));
+    public ResponseEntity getEnrollmentsByCourseId(@PathVariable("courseId") Long id, Pageable pageable) {
+        return ResponseEntity.ok(enrollmentService.getAllEnrollmentsByCourseId(id, pageable));
     }
 
-    @GetMapping(value = "/filter")
-    public ResponseEntity getFilteredEnrollments(@RequestParam int grade, @RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(enrollmentService.getFilteredEnrollments(grade, pageNo, pageSize));
+    @PostMapping(value = "/filter")
+    public ResponseEntity getFilteredEnrollments(@RequestBody List<FilterDTO> filterDTO, Pageable pageable) {
+        return ResponseEntity.ok(enrollmentService.getFilteredEnrollments(filterDTO, pageable));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity saveEnrollment(@RequestBody Enrollment enrollment) {
         try {
             return ResponseEntity.ok(enrollmentService.saveEnrollment(enrollment));
@@ -47,7 +51,7 @@ public class EnrollmentController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity deleteEnrollment(@PathVariable("id") Long id) {
         try {
             enrollmentService.deleteEnrollment(id);
@@ -58,7 +62,7 @@ public class EnrollmentController {
     }
 
     @PutMapping(value = "/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESSOR') or hasRole('DEMONSTRATOR')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('PROFESSOR') or hasAuthority('DEMONSTRATOR')")
     public ResponseEntity updateEnrollment(@PathVariable("id") Long id, @RequestBody EnrollmentUpdateRequest enrollment) {
         try {
             enrollmentService.updateEnrollment(enrollment, id);

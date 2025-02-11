@@ -4,10 +4,9 @@ import ba.imad.sis.domain.TeachingAssignment;
 import ba.imad.sis.dtos.FilterDTO;
 import ba.imad.sis.dtos.TeachingAssignmentUpdateRequest;
 import ba.imad.sis.repositories.TeachingAssignmentRepository;
-import ba.imad.sis.specifications.ProfessorSpecification;
+import ba.imad.sis.specifications.FilterSpecifications;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +21,7 @@ public class DefaultTeachingAssignmentService implements TeachingAssignmentServi
     }
 
     @Override
-    public Page<TeachingAssignment> getTeachingAssignments(int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+    public Page<TeachingAssignment> getTeachingAssignments(Pageable pageable) {
         return teachingAssignmentRepository.findAll(pageable);
     }
 
@@ -33,21 +31,18 @@ public class DefaultTeachingAssignmentService implements TeachingAssignmentServi
     }
 
     @Override
-    public Page<TeachingAssignment> getTeachingAssignmentsByProffessorId(Long proffessorId, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+    public Page<TeachingAssignment> getTeachingAssignmentsByProffessorId(Long proffessorId, Pageable pageable) {
         return teachingAssignmentRepository.findAllByProfessorId(proffessorId, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public Page<TeachingAssignment> getTeachingAssignmentsByCourseId(Long courseId, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
+    public Page<TeachingAssignment> getTeachingAssignmentsByCourseId(Long courseId, Pageable pageable) {
         return teachingAssignmentRepository.findAllByCourseId(courseId, pageable).orElse(Page.empty(pageable));
     }
 
     @Override
-    public Page<TeachingAssignment> getFilteredTeachingAssignments(List<FilterDTO> filterDTO, int pageNo, int pageSize) {
-        Pageable pageable = PageRequest.of(pageNo, pageSize);
-        return teachingAssignmentRepository.findAll(ProfessorSpecification.columnEqualsTeachingAssignment(filterDTO), pageable);
+    public Page<TeachingAssignment> getFilteredTeachingAssignments(List<FilterDTO> filterDTO, Pageable pageable) {
+        return teachingAssignmentRepository.findAll(FilterSpecifications.columnEquals(filterDTO), pageable);
     }
 
     @Override

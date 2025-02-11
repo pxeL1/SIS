@@ -9,6 +9,8 @@ public class Enrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer points = 0;
+    private String semester;
+    private Boolean passed;
     @Nullable
     private Integer grade;
     @ManyToOne
@@ -16,14 +18,32 @@ public class Enrollment {
     @ManyToOne
     private User student;
 
-    public Enrollment(Integer points, @Nullable Integer grade, Course course, User student) {
+    public Enrollment(Integer points, @Nullable Integer grade, Course course, User student, String semester, Boolean passed) {
         this.points = points;
         this.grade = grade;
         this.course = course;
         this.student = student;
+        this.semester = semester;
+        this.passed = passed;
     }
 
     public Enrollment() {
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
+    public boolean isPassed() {
+        return passed;
+    }
+
+    public void setPassed(Boolean passed) {
+        this.passed = passed;
     }
 
     public Long getId() {

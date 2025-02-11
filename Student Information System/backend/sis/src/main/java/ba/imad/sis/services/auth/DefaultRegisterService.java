@@ -1,6 +1,7 @@
 package ba.imad.sis.services.auth;
 
 import ba.imad.sis.domain.ProfessorInformation;
+import ba.imad.sis.domain.Role;
 import ba.imad.sis.domain.StudentInformation;
 import ba.imad.sis.domain.User;
 import ba.imad.sis.dtos.RegisterRequest;
@@ -9,8 +10,6 @@ import ba.imad.sis.services.professorinformation.ProfessorInformationService;
 import ba.imad.sis.services.studentinformation.StudentInformationService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
 
 @Service
 public class DefaultRegisterService implements RegisterService {
@@ -37,12 +36,12 @@ public class DefaultRegisterService implements RegisterService {
         User user = new User(registerRequest.email(), passwordEncoder.encode(registerRequest.password()), registerRequest.role());
         userRepository.save(user);
 
-        if(Arrays.asList(user.getRole().split(",")).contains("STUDENT")){
+        if(user.getRole().equals(Role.STUDENT)){
             StudentInformation studentInformation = new StudentInformation(registerRequest.firstName(), registerRequest.lastName(), registerRequest.index(), registerRequest.enrollmentYear(), user);
 
             studentInformationService.saveStudentInformation(studentInformation);
         }
-        else if(Arrays.asList(user.getRole().split(",")).contains("PROFESSOR")){
+        else if(user.getRole().equals(Role.PROFESSOR)){
             ProfessorInformation professorInformation = new ProfessorInformation(registerRequest.firstName(), registerRequest.lastName(), user);
 
             professorInformationService.saveProfessorInformation(professorInformation);
