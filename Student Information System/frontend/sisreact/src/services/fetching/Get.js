@@ -13,6 +13,6 @@ export default async function get(url) {
         const resJson = await res.json();
         return { data : resJson , status : res.ok };
     } else {
-        return { data : {}, status: res.body };
+        return { data : {}, status: false };
     }
 }

@@ -25,7 +25,7 @@ function App() {
     }
 
     function handleLogout() {
-        setCurrentUser(null);
+        setCurrentUser(undefined);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("roles");
@@ -33,16 +33,18 @@ function App() {
     }
 
     useEffect(() => {
+        setCurrentUser(JSON.parse(localStorage.getItem("user")));
         const token = localStorage.getItem("token");
-        if(token !== "undefined") {
+        if (token !== "undefined") {
             const url = "auth/validate";
             get(url).then(response => {
-                if(response.status) {
+                if (response.status) {
                     setCurrentUser(JSON.parse(localStorage.getItem("user")));
                 } else {
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     localStorage.removeItem("roles");
+                    navigate("/login");
                 }
             })
         }

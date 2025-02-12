@@ -20,6 +20,7 @@ export function LoginPage({handleLogin, badLogin, setBadLogin}) {
         if(!res.status) {
             setBadLogin(true);
         } else {
+            setBadLogin(false);
             handleLogin(res.data.user, res.data.token);
         }
     }
