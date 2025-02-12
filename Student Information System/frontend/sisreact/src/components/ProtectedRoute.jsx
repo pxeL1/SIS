@@ -6,7 +6,7 @@ export default function ProtectedRoute() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(!token) {
+        if(token === "undefined") {
             navigate('/login');
         }
     }, [token]);

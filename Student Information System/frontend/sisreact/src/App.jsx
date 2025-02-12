@@ -13,13 +13,14 @@ import get from "./services/fetching/Get.js";
 
 function App() {
     const [currentUser, setCurrentUser] = useState();
+    const [badLogin, setBadLogin] = useState(false);
     const navigate = useNavigate();
 
     function handleLogin(user, token) {
         setCurrentUser(user);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("roles", JSON.stringify(user.role))
+        localStorage.setItem("roles", JSON.stringify(user?.role))
         navigate("/");
     }
 
@@ -33,7 +34,7 @@ function App() {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
-        if(token) {
+        if(token !== "undefined") {
             const url = "auth/validate";
             get(url).then(response => {
                 if(response.status) {
@@ -50,7 +51,7 @@ function App() {
     return (
         <UserContext.Provider value={currentUser}>
             <Routes>
-                <Route path="/login" element={<LoginPage handleLogin={handleLogin} />} />
+                <Route path="/login" element={<LoginPage handleLogin={handleLogin} badLogin={badLogin} setBadLogin={setBadLogin} />} />
                 <Route element={<ProtectedRoute/>}>
                     <Route element={<Layout handleLogout={handleLogout} />}>
                         <Route path="/" element={<Home/>} />

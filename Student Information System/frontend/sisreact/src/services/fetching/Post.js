@@ -14,6 +14,6 @@ export default async function post(url, postRequest) {
         const resJson = await res.json();
         return { data : resJson , status : res.ok };
     } else {
-        return { data : {}, status: res.body };
+        return { data : {}, status: false };
     }
 }
