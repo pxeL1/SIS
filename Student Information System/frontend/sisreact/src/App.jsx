@@ -2,7 +2,7 @@ import './App.css'
 import {Routes, Route, useNavigate} from "react-router-dom";
 import {Home} from './pages/Home.jsx';
 import {Profile} from './pages/Profile';
-import {Course} from './pages/Course.jsx';
+import {Courses} from './pages/Courses.jsx';
 import {Messages} from './pages/Messages';
 import {Layout} from "./Layout.jsx";
 import {LoginPage} from "./pages/LoginPage.jsx";
@@ -58,7 +58,7 @@ function App() {
                     <Route element={<Layout handleLogout={handleLogout} />}>
                         <Route path="/" element={<Home/>} />
                         <Route path="/profile" element={<Profile/>} />
-                        <Route path="/courses" element={<Course/>} />
+                        <Route path="/courses" element={<Courses/>} />
                         <Route path="/messages" element={<Messages/>} />
                     </Route>
                 </Route>

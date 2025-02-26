@@ -13,6 +13,6 @@ export default async function put(url, putRequest) {
     if(res.status === 200) {
         return { status : res.ok };
     } else {
-        return { status: res.statusText };
+        return { status: false };
     }
 }
